@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brew Ratio Calculator</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.8/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.8/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/600.css">
+<style>
+  :root{
+    --cream:#f7f1e7; --card:#fffdf9; --line:#e6d8c2; --ink:#2b1d12;
+    --ink-soft:#7a6a55; --amber:#c98a3d; --amber-deep:#a8681f;
+    --amber-soft:#fdf3e2; --dark:#241609; --dark-2:#3a2413;
+    --milk:#f5e9d7; --gold:#e3a857; --water:#6f9bb3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--cream);
+    background-image:radial-gradient(#e9dcc5 1.1px, transparent 1.1px);
+    background-size:24px 24px;
+    color:var(--ink);
+    min-height:100vh;
+    padding:40px 20px 60px;
+  }
+  .wrap{max-width:1040px; margin:0 auto;}
+
+  /* ---------- Header ---------- */
+  header{margin-bottom:32px; text-align:left;}
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#fff8ec; border:1px solid #eedbb8; color:var(--amber-deep);
+    font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    padding:6px 14px; border-radius:999px; margin-bottom:14px;
+  }
+  .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+  h1{
+    font-family:'Fraunces',serif; font-weight:700;
+    font-size:clamp(30px,5vw,44px); line-height:1.1; letter-spacing:-.01em;
+  }
+  h1 em{font-style:italic; color:var(--amber-deep);}
+  .tag{color:var(--ink-soft); margin-top:8px; font-size:15px;}
+
+  /* ---------- Layout ---------- */
+  .grid{display:grid; grid-template-columns:1.05fr .95fr; gap:22px; align-items:start;}
+  @media(max-width:880px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:22px;
+    padding:26px; box-shadow:0 14px 34px rgba(66,42,17,.09);
+  }
+  .section-label{
+    font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:10px;
+  }
+
+  /* ---------- Method selector ---------- */
+  .methods{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px;}
+  @media(max-width:420px){.methods{grid-template-columns:1fr;}}
+  .method{
+    display:flex; flex-direction:column; gap:6px; text-align:left;
+    background:#fff; border:1.5px solid var(--line); border-radius:16px;
+    padding:14px; cursor:pointer; transition:all .18s ease;
+    font-family:inherit; color:var(--ink);
+  }
+  .method:hover{border-color:#d8bf9a; transform:translateY(-2px);}
+  .method.selected{
+    border-color:var(--amber); background:var(--amber-soft);
+    box-shadow:0 6px 16px rgba(201,138,61,.18);
+  }
+  .method .icon{color:#9c8668; transition:color .18s;}
+  .method.selected .icon{color:var(--amber-deep);}
+  .method .m-name{font-weight:600; font-size:14.5px;}
+  .method .m-ratio{
+    font-size:12px; color:var(--ink-soft);
+    background:#f4ecdd; border-radius:999px; padding:2px 9px; align-self:flex-start;
+    font-variant-numeric:tabular-nums;
+  }
+  .method.selected .m-ratio{background:#f3ddb9; color:var(--amber-deep); font-weight:600;}
+
+  /* ---------- Segmented toggle ---------- */
+  .seg{
+    display:flex; background:#f0e6d3; border-radius:999px; padding:4px; margin-bottom:14px;
+  }
+  .seg button{
+    flex:1; border:none; background:transparent; font-family:inherit; font-weight:600;
+    font-size:13.5px; padding:9px 6px; border-radius:999px; cursor:pointer;
+    color:var(--ink-soft); transition:all .18s;
+  }
+  .seg button.on{background:#fff; color:var(--ink); box-shadow:0 2px 6px rgba(70,45,20,.14);}
+
+  /* ---------- Stepper input ---------- */
+  .stepper{display:flex; align-items:stretch; gap:8px; margin-bottom:6px;}
+  .step-btn{
+    width:52px; border-radius:14px; border:1.5px solid var(--line); background:#fff;
+    font-size:22px; font-weight:600; color:var(--amber-deep); cursor:pointer;
+    transition:all .15s; font-family:inherit;
+  }
+  .step-btn:hover{background:var(--amber-soft); border-color:var(--amber);}
+  .step-btn:active{transform:scale(.94);}
+  .num-field{
+    flex:1; display:flex; align-items:baseline; justify-content:center; gap:8px;
+    background:#fdf9f1; border:1.5px solid var(--line); border-radius:14px; padding:8px 14px;
+  }
+  .num-field:focus-within{border-color:var(--amber); box-shadow:0 0 0 4px rgba(201,138,61,.15);}
+  .num-field input{
+    border:none; outline:none; background:transparent; text-align:right;
+    font-family:'Fraunces',serif; font-weight:600; font-size:30px; color:var(--ink);
+    width:96px; -moz-appearance:textfield;
+  }
+  .num-field input::-webkit-inner-spin-button,.num-field input::-webkit-outer-spin-button{-webkit-appearance:none;}
+  .unit{font-size:14px; font-weight:600; color:var(--ink-soft);}
+  .hint{font-size:12.5px; color:var(--ink-soft); margin-bottom:22px;}
+
+  /* ---------- Strength slider ---------- */
+  .strength-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;}
+  #strengthDesc{font-size:12.5px; color:var(--amber-deep); font-weight:600;}
+  .slider-row{position:relative; padding-bottom:26px;}
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:99px;
+    background:linear-gradient(to right,#ecd9b8,#c98a3d); outline:none; cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:#fff; border:3px solid var(--amber-deep);
+    box-shadow:0 3px 8px rgba(70,45,20,.3); cursor:grab; transition:transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12);}
+  input[type=range]::-moz-range-thumb{
+    width:22px; height:22px; border-radius:50%; background:#fff;
+    border:3px solid var(--amber-deep); box-shadow:0 3px 8px rgba(70,45,20,.3); cursor:grab;
+  }
+  .ticks{display:flex; justify-content:space-between; margin-top:10px;}
+  .ticks span{
+    font-size:12px; font-weight:600; color:#b3a186; cursor:pointer; transition:color .15s;
+    flex:1; text-align:center;
+  }
+  .ticks span:first-child{text-align:left;}
+  .ticks span:last-child{text-align:right;}
+  .ticks span.on{color:var(--amber-deep);}
+
+  /* ---------- Results ---------- */
+  .results{
+    background:linear-gradient(160deg,var(--dark-2) 0%,var(--dark) 70%);
+    border:1px solid #4a3220; border-radius:22px; padding:28px;
+    color:var(--milk); box-shadow:0 18px 40px rgba(46,28,12,.28);
+    position:relative; overflow:hidden;
+  }
+  .results::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at 85% -10%, rgba(227,168,87,.18), transparent 55%);
+  }
+  .results h2{
+    font-family:'Fraunces',serif; font-size:20px; font-weight:600; margin-bottom:4px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .ratio-chip{
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:600; letter-spacing:.04em;
+    background:rgba(227,168,87,.16); border:1px solid rgba(227,168,87,.45); color:var(--gold);
+    padding:5px 13px; border-radius:999px; font-variant-numeric:tabular-nums;
+  }
+  .r-sub{font-size:13px; color:#b79d7e; margin-bottom:22px;}
+  .stat{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+    padding:18px 0; border-top:1px solid rgba(245,233,215,.12);
+  }
+  .stat .lbl{font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:#b79d7e; margin-bottom:6px;}
+  .big{
+    font-family:'Fraunces',serif; font-weight:700; font-size:clamp(34px,6vw,46px);
+    line-height:1; color:#fdf6ea; font-variant-numeric:tabular-nums;
+  }
+  .big small{font-size:.45em; font-weight:600; color:#cbb08c; margin-left:4px;}
+  .conv{font-size:14px; color:var(--gold); font-weight:500; white-space:nowrap; padding-bottom:4px; font-variant-numeric:tabular-nums;}
+  .bump{animation:bump .38s ease;}
+  @keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.06)}100%{transform:scale(1)}}
+  .big,.conv{display:inline-block; transform-origin:left center;}
+
+  /* ratio bar */
+  .bar-wrap{padding:16px 0 18px; border-top:1px solid rgba(245,233,215,.12);}
+  .bar{height:12px; border-radius:99px; overflow:hidden; display:flex; background:rgba(255,255,255,.07);}
+  .bar .c{background:linear-gradient(90deg,#e3a857,#c98a3d); transition:width .45s cubic-bezier(.4,0,.2,1);}
+  .bar .w{background:linear-gradient(90deg,#7fa9bf,#5f8ba4); transition:width .45s cubic-bezier(.4,0,.2,1);}
+  .bar-legend{display:flex; justify-content:space-between; margin-top:8px; font-size:11.5px; color:#b79d7e;}
+  .bar-legend b{color:#e8d7bc;}
+
+  /* brew guide */
+  .guide{display:flex; flex-wrap:wrap; gap:8px; padding-top:18px; border-top:1px solid rgba(245,233,215,.12);}
+  .pill{
+    display:inline-flex; align-items:center; gap:7px; font-size:12.5px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(245,233,215,.14);
+    border-radius:999px; padding:7px 13px; color:#e8d7bc;
+  }
+  .pill svg{color:var(--gold); flex-shrink:0;}
+  .pill b{color:#fdf6ea; font-weight:600;}
+
+  footer{margin-top:26px; text-align:center; font-size:12.5px; color:#a4917a;}
+  footer b{color:#8a7458;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge"><span class="dot"></span> Instant · No sign-up · Works offline-ish</div>
+    <h1>Coffee Brew <em>Ratio</em> Calculator</h1>
+    <p class="tag">Dial in the perfect cup — pick a method, tell us your target, and get exact grams &amp; millilitres.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- CONTROLS -->
+    <section class="card" aria-label="Brew settings">
+      <div class="section-label">1 · Brew method</div>
+      <div class="methods" id="methods" role="radiogroup" aria-label="Brew method"></div>
+
+      <div class="section-label">2 · What are you measuring?</div>
+      <div class="seg" role="tablist">
+        <button id="modeCups" class="on" type="button">☕ I want cups</button>
+        <button id="modeGrams" type="button">⚖️ I have coffee (g)</button>
+      </div>
+
+      <div id="cupsBlock">
+        <div class="stepper">
+          <button class="step-btn" type="button" data-step="-0.5" data-target="cups">−</button>
+          <div class="num-field">
+            <input id="cupsInput" type="number" min="0.5" max="16" step="0.5" value="2" inputmode="decimal">
+            <span class="unit" id="cupsUnit">cups</span>
+          </div>
+          <button class="step-btn" type="button" data-step="0.5" data-target="cups">+</button>
+        </div>
+        <div class="hint" id="cupNote">1 cup ≈ 250 ml of brewed coffee</div>
+      </div>
+
+      <div id="gramsBlock" style="display:none;">
+        <div class="stepper">
+          <button class="step-btn" type="button" data-step="-1" data-target="grams">−</button>
+          <div class="num-field">
+            <input id="gramsInput" type="number" min="1" max="200" step="1" value="30" inputmode="decimal">
+            <span class="unit">grams of coffee</span>
+          </div>
+          <button class="step-btn" type="button" data-step="1" data-target="grams">+</button>
+        </div>
+        <div class="hint">Use whatever beans you have — we'll match the water.</div>
+      </div>
+
+      <div class="strength-head">
+        <div class="section-label" style="margin:0;">3 · Strength</div>
+        <span id="strengthDesc">Balanced — the gold standard</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="strength" min="0" max="2" step="1" value="1" aria-label="Brew strength">
+        <div class="ticks">
+          <span data-val="0">Mild</span>
+          <span data-val="1" class="on">Medium</span>
+          <span data-val="2">Strong</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="results" aria-live="polite" aria-label="Recipe results">
+      <h2><span id="methodName">Pour Over</span> <span class="ratio-chip" id="ratioChip">1 : 15</span></h2>
+      <div class="r-sub" id="methodSub">Your recipe, live-updated</div>
+
+      <div class="stat">
+        <div>
+          <div class="lbl">Water</div>
+          <div class="big" id="waterMl">500<small>ml</small></div>
+        </div>
+        <div class="conv" id="waterOz">≈ 16.9 fl oz</div>
+      </div>
+
+      <div class="stat">
+        <div>
+          <div class="lbl">Coffee</div>
+          <div class="big" id="coffeeG">33.3<small>g</small></div>
+        </div>
+        <div class="conv" id="coffeeTbsp">≈ 6.1 tbsp</div>
+      </div>
+
+      <div class="bar-wrap">
+        <div class="bar">
+          <div class="c" id="barCoffee"></div>
+          <div class="w" id="barWater"></div>
+        </div>
+        <div class="bar-legend"><span><b>1 part</b> coffee</span><span><b id="barParts">15 parts</b> water</span></div>
+      </div>
+
+      <div class="guide">
+        <span class="pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+          Grind <b id="gGrind">Medium-fine</b>
+        </span>
+        <span class="pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v10"/><path d="M12 13a4 4 0 1 0 4 4"/></svg>
+          <b id="gTemp">94°C / 201°F</b>
+        </span>
+        <span class="pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/></svg>
+          Brew <b id="gTime">2:30 – 3:30</b>
+        </span>
+      </div>
+    </section>
+  </div>
+
+  <footer>Conversions: <b>1 tbsp ≈ 5.5 g</b> of ground coffee · <b>1 fl oz ≈ 29.6 ml</b> · Ratios are starting points — tweak to taste.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const METHODS = {
+    pourOver:    { name:"Pour Over",    ratio:15, cupMl:250, grind:"Medium-fine", temp:"94°C / 201°F", time:"2:30 – 3:30",
+      icon:'<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14h26l-9 16h-8z"/><path d="M22 33v3"/><circle cx="24" cy="39" r="1.4" fill="currentColor" stroke="none"/><path d="M14 43h20"/></svg>' },
+    frenchPress: { name:"French Press", ratio:12, cupMl:300, grind:"Coarse", temp:"96°C / 205°F", time:"4:00",
+      icon:'<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="13" y="14" width="20" height="24" rx="3"/><path d="M11 14h24"/><path d="M24 6v8"/><circle cx="24" cy="5" r="2"/><path d="M15 21h16" stroke-dasharray="3 3"/><path d="M33 18h4v8"/></svg>' },
+    aeroPress:   { name:"AeroPress",    ratio:13, cupMl:200, grind:"Medium-fine", temp:"88°C / 190°F", time:"1:30 – 2:00",
+      icon:'<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="17" y="16" width="14" height="22" rx="2"/><path d="M15 16h18"/><path d="M20 8h8v8h-8z"/><path d="M22 16v-4M26 16v-4"/><path d="M20 24h8"/></svg>' },
+    drip:        { name:"Drip Machine", ratio:16, cupMl:250, grind:"Medium", temp:"Auto (92–96°C)", time:"4:30 – 5:30",
+      icon:'<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="7" width="26" height="34" rx="4"/><path d="M11 15h26"/><path d="M24 18v4" stroke-dasharray="2 3"/><path d="M19 26h9l-1.4 9h-6.2z"/></svg>' }
+  };
+
+  const OFFSETS = [2, 0, -2];
+  const STRENGTH_DESC = ["Mild — gentle & easy-drinking","Balanced — the gold standard","Strong — bold & rich"];
+  const TBSP_G = 5.5, ML_PER_OZ = 29.5735;
+
+  const state = { method:"pourOver", mode:"cups", cups:2, grams:30, strength:1 };
+
+  const $ = id => document.getElementById(id);
+
+  /* ---- Build method cards ---- */
+  const methodsWrap = $("methods");
+  Object.keys(METHODS).forEach(key => {
+    const m = METHODS[key];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "method" + (key === state.method ? " selected" : "");
+    btn.setAttribute("role","radio");
+    btn.setAttribute("aria-checked", key === state.method ? "true" : "false");
+    btn.innerHTML =
+      '<span class="icon">' + m.icon + '</span>' +
+      '<span class="m-name">' + m.name + '</span>' +
+      '<span class="m-ratio">1 : ' + m.ratio + '</span>';
+    btn.addEventListener("click", () => {
+      state.method = key;
+      methodsWrap.querySelectorAll(".method").forEach(b => { b.classList.remove("selected"); b.setAttribute("aria-checked","false"); });
+      btn.classList.add("selected");
+      btn.setAttribute("aria-checked","true");
+      $("cupNote").textContent = "1 cup ≈ " + METHODS[key].cupMl + " ml of brewed coffee";
+      render();
+    });
+    methodsWrap.appendChild(btn);
+  });
+
+  /* ---- Mode toggle ---- */
+  function setMode(mode){
+    state.mode = mode;
+    $("modeCups").classList.toggle("on", mode === "cups");
+    $("modeGrams").classList.toggle("on", mode === "grams");
+    $("cupsBlock").style.display = mode === "cups" ? "" : "none";
+    $("gramsBlock").style.display = mode === "grams" ? "" : "none";
+    render();
+  }
+  $("modeCups").addEventListener("click", () => setMode("cups"));
+  $("modeGrams").addEventListener("click", () => setMode("grams"));
+
+  /* ---- Steppers ---- */
+  document.querySelectorAll(".step-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      const delta = parseFloat(btn.dataset.step);
+      if(target === "cups"){ state.cups = clamp(state.cups + delta, 0.5, 16); $("cupsInput").value = trimNum(state.cups); }
+      else { state.grams = clamp(state.grams + delta, 1, 200); $("gramsInput").value = trimNum(state.grams); }
+      render();
+    });
+  });
+
+  $("cupsInput").addEventListener("input", e => {
+    const v = parseFloat(e.target.value);
+    if(!isNaN(v)) { state.cups = v; render(); }
+  });
+  $("cupsInput").addEventListener("blur", e => {
+    state.cups = clamp(state.cups || 1, 0.5, 16);
+    e.target.value = trimNum(state.cups); render();
+  });
+  $("gramsInput").addEventListener("input", e => {
+    const v = parseFloat(e.target.value);
+    if(!isNaN(v)) { state.grams = v; render(); }
+  });
+  $("gramsInput").addEventListener("blur", e => {
+    state.grams = clamp(state.grams || 15, 1, 200);
+    e.target.value = trimNum(state.grams); render();
+  });
+
+  /* ---- Strength ---- */
+  const strengthEl = $("strength");
+  const tickSpans = document.querySelectorAll(".ticks span");
+  function setStrength(v){
+    state.strength = v;
+    strengthEl.value = v;
+    $("strengthDesc").textContent = STRENGTH_DESC[v];
+    tickSpans.forEach(s => s.classList.toggle("on", +s.dataset.val === v));
+    render();
+  }
+  strengthEl.addEventListener("input", () => setStrength(+strengthEl.value));
+  tickSpans.forEach(s => s.addEventListener("click", () => setStrength(+s.dataset.val)));
+
+  /* ---- Helpers ---- */
+  function clamp(n, lo, hi){ return Math.min(hi, Math.max(lo, n)); }
+  function trimNum(n){ return (Math.round(n * 10) / 10).toString(); }
+  function bump(el){ el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+
+  /* ---- Render ---- */
+  function render(){
+    const m = METHODS[state.method];
+    const ratio = m.ratio + OFFSETS[state.strength];
+    let waterMl, coffeeG;
+
+    if(state.mode === "cups"){
+      waterMl = state.cups * m.cupMl;
+      coffeeG = waterMl / ratio;
+    } else {
+      coffeeG = state.grams;
+      waterMl = coffeeG * ratio;
+    }
+
+    const waterR = Math.round(waterMl);
+    const oz = (waterMl / ML_PER_OZ).toFixed(1);
+    const coffeeR = coffeeG >= 100 ? Math.round(coffeeG) : (Math.round(coffeeG * 10) / 10).toFixed(1);
+    const tbsp = (coffeeG / TBSP_G).toFixed(1);
+
+    setBumped("waterMl", waterR.toLocaleString("en-US") + "<small>ml</small>");
+    setBumped("waterOz", "≈ " + oz + " fl oz");
+    setBumped("coffeeG", coffeeR + "<small>g</small>");
+    setBumped("coffeeTbsp", "≈ " + tbsp + " tbsp");
+    setBumped("ratioChip", "1 : " + ratio);
+
+    $("methodName").textContent = m.name;
+    $("methodSub").textContent = state.mode === "cups"
+      ? trimNum(state.cups) + " cup" + (state.cups === 1 ? "" : "s") + " × " + m.cupMl + " ml, at " + STRENGTH_DESC[state.strength].split(" — ")[0].toLowerCase() + " strength"
+      : trimNum(state.grams) + " g of coffee, at " + STRENGTH_DESC[state.strength].split(" — ")[0].toLowerCase() + " strength";
+
+    const coffeePct = (100 / (1 + ratio)).toFixed(2);
+    $("barCoffee").style.width = coffeePct + "%";
+    $("barWater").style.width = (100 - coffeePct) + "%";
+    $("barParts").textContent = ratio + " parts";
+
+    $("gGrind").textContent = m.grind;
+    $("gTemp").textContent = m.temp;
+    $("gTime").textContent = m.time;
+  }
+
+  function setBumped(id, html){
+    const el = $(id);
+    if(el.innerHTML !== html){ el.innerHTML = html; bump(el); }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
