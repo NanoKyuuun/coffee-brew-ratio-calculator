@@ -5,119 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brew Ratio Calculator</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.8/700.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.8/600.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/400.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/500.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/600.css">
 <style>
-  :root{--cream:#f7f1e7;--card:#fffdf9;--line:#e6d8c2;--ink:#2b1d12;--ink-s:#7a6a55;--amber:#c98a3d;--amber-d:#a8681f;--amber-s:#fdf3e2;--dark:#241609;--dark2:#3a2413;--milk:#f5e9d7;--gold:#e3a857;--r:18px;--rs:12px;--sh:0 14px 34px rgba(66,42,17,.09)}
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',system-ui,sans-serif;background:var(--cream);background-image:radial-gradient(#e9dcc5 1.1px,transparent 1.1px);background-size:24px 24px;color:var(--ink);min-height:100vh;padding:clamp(24px,5vw,48px) clamp(16px,4vw,20px) 60px;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1040px;margin:0 auto}
-  :focus-visible{outline:2.5px solid var(--amber);outline-offset:3px;border-radius:6px}
-  button:focus-visible{outline-offset:4px}
-  .skip{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-  .skip:focus{position:fixed;top:16px;left:16px;width:auto;height:auto;background:var(--ink);color:#fff;padding:10px 18px;border-radius:var(--rs);font-weight:600;font-size:14px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-  header{margin-bottom:36px;text-align:left}
-  .badge{display:inline-flex;align-items:center;gap:8px;background:#fff8ec;border:1px solid #eedbb8;color:var(--amber-d);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:14px}
-  .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
-  h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(28px,5vw,44px);line-height:1.1;letter-spacing:-.01em}
-  h1 em{font-style:italic;color:var(--amber-d)}
-  .tag{color:var(--ink-s);margin-top:8px;font-size:clamp(14px,2vw,15px);line-height:1.5}
-  .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
-  @media(max-width:880px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,3vw,28px);box-shadow:var(--sh);transition:box-shadow .25s}
-  .card:hover{box-shadow:0 18px 42px rgba(66,42,17,.12)}
-  .sl{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-s);margin-bottom:10px}
-  .methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
-  @media(max-width:420px){.methods{grid-template-columns:1fr}}
-  .method{display:flex;flex-direction:column;gap:6px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .18s;font-family:inherit;color:var(--ink)}
-  .method:hover{border-color:#d8bf9a;transform:translateY(-2px);box-shadow:0 6px 16px rgba(66,42,17,.08)}
-  .method:active{transform:translateY(0)}
-  .method.selected{border-color:var(--amber);background:var(--amber-s);box-shadow:0 6px 16px rgba(201,138,61,.18)}
-  .method .icon{font-size:24px;transition:color .18s}
-  .method .mn{font-weight:600;font-size:14.5px}
-  .method .mr{font-size:12px;color:var(--ink-s);background:#f4ecdd;border-radius:999px;padding:2px 9px;align-self:flex-start;font-variant-numeric:tabular-nums}
-  .method.selected .mr{background:#f3ddb9;color:var(--amber-d);font-weight:600}
-  .seg{display:flex;background:#f0e6d3;border-radius:999px;padding:4px;margin-bottom:14px}
-  .seg button{flex:1;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:clamp(12.5px,1.8vw,13.5px);padding:9px 6px;border-radius:999px;cursor:pointer;color:var(--ink-s);transition:all .18s}
-  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(70,45,20,.14)}
-  .stepper{display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
-  .step-btn{width:52px;border-radius:var(--rs);border:1.5px solid var(--line);background:#fff;font-size:22px;font-weight:600;color:var(--amber-d);cursor:pointer;transition:all .15s;font-family:inherit}
-  .step-btn:hover{background:var(--amber-s);border-color:var(--amber)}
-  .step-btn:active{transform:scale(.94)}
-  .nf{flex:1;display:flex;align-items:baseline;justify-content:center;gap:8px;background:#fdf9f1;border:1.5px solid var(--line);border-radius:var(--rs);padding:8px 14px;transition:border-color .2s,box-shadow .2s}
-  .nf:focus-within{border-color:var(--amber);box-shadow:0 0 0 4px rgba(201,138,61,.15)}
-  .nf input{border:none;outline:none;background:transparent;text-align:right;font-family:'Fraunces',serif;font-weight:600;font-size:30px;color:var(--ink);width:96px;-moz-appearance:textfield}
-  .nf input::-webkit-inner-spin-button,.nf input::-webkit-outer-spin-button{-webkit-appearance:none}
-  .unit{font-size:14px;font-weight:600;color:var(--ink-s)}
-  .hint{font-size:12.5px;color:var(--ink-s);margin-bottom:22px}
-  .err{color:#c0392b;font-weight:600;font-size:12.5px;margin-bottom:22px}
-  .sh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
-  #strengthDesc{font-size:12.5px;color:var(--amber-d);font-weight:600;transition:color .2s}
-  .slider-row{position:relative;padding-bottom:26px}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:99px;background:linear-gradient(to right,#ecd9b8,#c98a3d);outline:none;cursor:pointer}
-  input[type=range]:focus-visible{box-shadow:0 0 0 4px rgba(201,138,61,.25)}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--amber-d);box-shadow:0 3px 8px rgba(70,45,20,.3);cursor:grab;transition:transform .15s}
-  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12)}
-  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--amber-d);box-shadow:0 3px 8px rgba(70,45,20,.3);cursor:grab}
-  .ticks{display:flex;justify-content:space-between;margin-top:10px}
-  .ticks span{font-size:12px;font-weight:600;color:#b3a186;cursor:pointer;transition:color .15s;flex:1;text-align:center;padding:4px 0;border-radius:6px}
-  .ticks span:first-child{text-align:left}
-  .ticks span:last-child{text-align:right}
-  .ticks span:hover{color:var(--amber-d)}
-  .ticks span.on{color:var(--amber-d)}
-  .actions{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-  .abtn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(245,233,215,.18);border-radius:999px;padding:8px 16px;color:#e8d7bc;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s}
-  .abtn:hover{background:rgba(255,255,255,.14);color:#fdf6ea;transform:translateY(-1px)}
-  .abtn:active{transform:scale(.96)}
-  .results{background:linear-gradient(160deg,var(--dark2) 0%,var(--dark) 70%);border:1px solid #4a3220;border-radius:22px;padding:clamp(22px,3vw,28px);color:var(--milk);box-shadow:0 18px 40px rgba(46,28,12,.28);position:relative;overflow:hidden}
-  .results::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 85% -10%,rgba(227,168,87,.18),transparent 55%)}
-  .results h2{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  .rc{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;background:rgba(227,168,87,.16);border:1px solid rgba(227,168,87,.45);color:var(--gold);padding:5px 13px;border-radius:999px;font-variant-numeric:tabular-nums}
-  .rsub{font-size:13px;color:#b79d7e;margin-bottom:22px;line-height:1.4}
-  .stat{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:18px 0;border-top:1px solid rgba(245,233,215,.12)}
-  .stat .lbl{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#b79d7e;margin-bottom:6px}
-  .big{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1;color:#fdf6ea;font-variant-numeric:tabular-nums}
-  .big small{font-size:.45em;font-weight:600;color:#cbb08c;margin-left:4px}
-  .conv{font-size:14px;color:var(--gold);font-weight:500;white-space:nowrap;padding-bottom:4px;font-variant-numeric:tabular-nums}
-  .bump{animation:bump .38s ease}
-  @keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.06)}100%{transform:scale(1)}}
-  .big,.conv{display:inline-block;transform-origin:left center}
-  .bar-wrap{padding:16px 0 18px;border-top:1px solid rgba(245,233,215,.12)}
-  .bar{height:12px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.07)}
-  .bar .c{background:linear-gradient(90deg,#e3a857,#c98a3d);transition:width .45s cubic-bezier(.4,0,.2,1)}
-  .bar .w{background:linear-gradient(90deg,#7fa9bf,#5f8ba4);transition:width .45s cubic-bezier(.4,0,.2,1)}
-  .bar-l{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:#b79d7e}
-  .bar-l b{color:#e8d7bc}
-  .guide{display:flex;flex-wrap:wrap;gap:8px;padding-top:18px;border-top:1px solid rgba(245,233,215,.12)}
-  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;background:rgba(255,255,255,.06);border:1px solid rgba(245,233,215,.14);border-radius:999px;padding:7px 13px;color:#e8d7bc;transition:background .15s}
-  .pill:hover{background:rgba(255,255,255,.1)}
-  .pill b{color:#fdf6ea;font-weight:600}
-  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:9999;white-space:nowrap}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  footer{margin-top:28px;text-align:center;font-size:12.5px;color:#a4917a;line-height:1.6}
-  footer b{color:#8a7458}
+:root{--cream:#f7f1e7;--card:#fffdf9;--line:#e6d8c2;--ink:#2b1d12;--ink-s:#7a6a55;--amber:#c98a3d;--amber-d:#a8681f;--amber-s:#fdf3e2;--dark:#241609;--dark2:#3a2413;--milk:#f5e9d7;--gold:#e3a857;--r:18px;--rs:12px;--sh:0 14px 34px rgba(66,42,17,.09)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--cream);background-image:radial-gradient(#e9dcc5 1.1px,transparent 1.1px);background-size:24px 24px;color:var(--ink);min-height:100vh;padding:clamp(24px,5vw,48px) clamp(16px,4vw,20px) 60px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto}
+:focus-visible{outline:2.5px solid var(--amber);outline-offset:3px;border-radius:6px}
+button:focus-visible{outline-offset:4px}
+.skip{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.skip:focus{position:fixed;top:16px;left:16px;width:auto;height:auto;background:var(--ink);color:#fff;padding:10px 18px;border-radius:var(--rs);font-weight:600;font-size:14px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.badge .dot{animation:none;opacity:1}}
+header{margin-bottom:36px;text-align:left}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#fff8ec;border:1px solid #eedbb8;color:var(--amber-d);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:14px}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(28px,5vw,44px);line-height:1.1;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--amber-d)}
+.tag{color:var(--ink-s);margin-top:8px;font-size:clamp(14px,2vw,15px);line-height:1.5}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+@media(max-width:880px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,3vw,28px);box-shadow:var(--sh);transition:box-shadow .25s}
+.card:hover{box-shadow:0 18px 42px rgba(66,42,17,.12)}
+.sl{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-s);margin-bottom:10px}
+.methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+@media(max-width:420px){.methods{grid-template-columns:1fr}}
+.method{display:flex;flex-direction:column;gap:6px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color .18s,background .18s,box-shadow .18s;min-height:48px;font-family:inherit;color:var(--ink)}
+.method:hover{border-color:#d8bf9a}
+.method[aria-checked="true"]{border-color:var(--amber);background:var(--amber-s);box-shadow:0 6px 16px rgba(201,138,61,.18)}
+.method .icon{font-size:24px}
+.method[aria-checked="true"] .icon{color:var(--amber-d)}
+.method .mn{font-weight:600;font-size:14.5px}
+.method .mr{font-size:12px;color:var(--ink-s);background:#f4ecdd;border-radius:999px;padding:2px 9px;align-self:flex-start;font-variant-numeric:tabular-nums}
+.method[aria-checked="true"] .mr{background:#f3ddb9;color:var(--amber-d);font-weight:600}
+.seg{display:flex;background:#f0e6d3;border-radius:999px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:clamp(12.5px,1.8vw,13.5px);padding:9px 6px;border-radius:999px;cursor:pointer;color:var(--ink-s);transition:background .18s,color .18s,box-shadow .18s;min-height:44px}
+.seg button[aria-checked="true"]{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(70,45,20,.14)}
+.stepper{display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
+.step-btn{width:52px;min-height:48px;border-radius:var(--rs);border:1.5px solid var(--line);background:#fff;font-size:22px;font-weight:600;color:var(--amber-d);cursor:pointer;transition:background .15s,border-color .15s;touch-action:manipulation;font-family:inherit}
+.step-btn:hover{background:var(--amber-s);border-color:var(--amber)}
+.step-btn:active{transform:scale(.94)}
+.nf{flex:1;display:flex;align-items:baseline;justify-content:center;gap:8px;background:#fdf9f1;border:1.5px solid var(--line);border-radius:var(--rs);padding:8px 14px;transition:border-color .2s,box-shadow .2s}
+.nf:focus-within{border-color:var(--amber);box-shadow:0 0 0 4px rgba(201,138,61,.15)}
+.nf input{border:none;outline:none;background:transparent;text-align:right;font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:clamp(24px,5vw,30px);color:var(--ink);width:clamp(72px,18vw,96px);min-width:0;-moz-appearance:textfield}
+.nf input::-webkit-inner-spin-button,.nf input::-webkit-outer-spin-button{-webkit-appearance:none}
+.unit{font-size:14px;font-weight:600;color:var(--ink-s);flex-shrink:0}
+.hint{font-size:12.5px;color:var(--ink-s);margin-bottom:22px}
+.err{color:#c0392b;font-weight:600;font-size:12.5px;margin:0 0 22px;min-height:1.4em}
+.sh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:4px}
+#strengthDesc{font-size:12.5px;color:var(--amber-d);font-weight:600}
+.slider-row{position:relative;padding-bottom:26px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:99px;background:linear-gradient(to right,#ecd9b8,#c98a3d);outline:none;cursor:pointer}
+input[type=range]:focus-visible{box-shadow:0 0 0 4px rgba(201,138,61,.25)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--amber-d);box-shadow:0 3px 8px rgba(70,45,20,.3);cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--amber-d);box-shadow:0 3px 8px rgba(70,45,20,.3);cursor:grab}
+.ticks{display:flex;justify-content:space-between;margin-top:10px}
+.ticks span{font-size:12px;font-weight:600;color:#b3a186;cursor:pointer;flex:1;text-align:center;padding:8px 0;border-radius:6px;min-height:44px;display:flex;align-items:center;justify-content:center;transition:color .15s}
+.ticks span:first-child{text-align:left;justify-content:flex-start}
+.ticks span:last-child{text-align:right;justify-content:flex-end}
+.ticks span:hover{color:var(--amber-d)}
+.ticks span[aria-checked="true"]{color:var(--amber-d)}
+.actions{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.abtn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(245,233,215,.18);border-radius:999px;padding:8px 16px;color:#e8d7bc;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .18s,color .18s,transform .15s;min-height:44px}
+.abtn:hover{background:rgba(255,255,255,.14);color:#fdf6ea}
+.abtn:active{transform:scale(.96)}
+.results{background:linear-gradient(160deg,var(--dark2) 0%,var(--dark) 70%);border:1px solid #4a3220;border-radius:22px;padding:clamp(22px,3vw,28px);color:var(--milk);box-shadow:0 18px 40px rgba(46,28,12,.28);position:relative;overflow:hidden}
+.results::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 85% -10%,rgba(227,168,87,.18),transparent 55%)}
+.results h2{font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rc{font-size:13px;font-weight:600;letter-spacing:.04em;background:rgba(227,168,87,.16);border:1px solid rgba(227,168,87,.45);color:var(--gold);padding:5px 13px;border-radius:999px;font-variant-numeric:tabular-nums}
+.rsub{font-size:13px;color:#b79d7e;margin-bottom:22px;line-height:1.4}
+.stat{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:18px 0;border-top:1px solid rgba(245,233,215,.12)}
+.stat .lbl{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#b79d7e;margin-bottom:6px}
+.big{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1;color:#fdf6ea;font-variant-numeric:tabular-nums}
+.big small{font-size:.45em;font-weight:600;color:#cbb08c;margin-left:4px}
+.conv{font-size:14px;color:var(--gold);font-weight:500;white-space:nowrap;padding-bottom:4px;font-variant-numeric:tabular-nums}
+.bump{animation:bump .38s ease}
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.06)}100%{transform:scale(1)}}
+.big,.conv{display:inline-block;transform-origin:left center}
+.bar-wrap{padding:16px 0 18px;border-top:1px solid rgba(245,233,215,.12)}
+.bar{height:12px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.07)}
+.bar .c{background:linear-gradient(90deg,#e3a857,#c98a3d);transition:width .45s cubic-bezier(.4,0,.2,1)}
+.bar .w{background:linear-gradient(90deg,#7fa9bf,#5f8ba4);transition:width .45s cubic-bezier(.4,0,.2,1)}
+.bar-l{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:#b79d7e}
+.bar-l b{color:#e8d7bc}
+.guide{display:flex;flex-wrap:wrap;gap:8px;padding-top:18px;border-top:1px solid rgba(245,233,215,.12)}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;background:rgba(255,255,255,.06);border:1px solid rgba(245,233,215,.14);border-radius:999px;padding:7px 13px;color:#e8d7bc}
+.pill b{color:#fdf6ea;font-weight:600}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:9999;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{margin-top:28px;text-align:center;font-size:12.5px;color:#a4917a;line-height:1.6}
+footer b{color:#8a7458}
 </style>
 </head>
 <body>
 <a href="#controls" class="skip">Skip to controls</a>
 <div class="wrap">
   <header>
-    <div class="badge"><span class="dot"></span> Instant · No sign-up · Works offline</div>
+    <div class="badge"><span class="dot" aria-hidden="true"></span> Instant · No sign-up · Works offline</div>
     <h1>Coffee Brew <em>Ratio</em> Calculator</h1>
     <p class="tag">Dial in the perfect cup — pick a method, tell us your target, and get exact grams &amp; millilitres.</p>
   </header>
   <div class="grid">
-    <section class="card" id="controls" aria-label="Brew settings">
-      <div class="sl">1 · Brew method</div>
-      <div class="methods" id="methods" role="radiogroup" aria-label="Brew method"></div>
-      <div class="sl">2 · What are you measuring?</div>
-      <div class="seg" role="tablist" aria-label="Measurement mode">
-        <button id="modeCups" class="on" type="button" role="tab" aria-selected="true">☕ I want cups</button>
-        <button id="modeGrams" type="button" role="tab" aria-selected="false">⚖️ I have coffee (g)</button>
+    <section class="card" id="controls" aria-labelledby="controlsHeading">
+      <h2 class="sl" id="controlsHeading" style="font-size:inherit;letter-spacing:inherit;text-transform:none;font-weight:inherit;color:inherit;margin-bottom:0">Brew Settings</h2>
+      <div class="sl" id="methodLabel" style="margin-top:16px">1 · Brew method</div>
+      <div class="methods" id="methods" role="radiogroup" aria-labelledby="methodLabel"></div>
+      <div class="sl" id="modeLabel">2 · What are you measuring?</div>
+      <div class="seg" role="radiogroup" aria-labelledby="modeLabel" id="modeGroup">
+        <button id="modeCups" type="button" role="radio" aria-checked="true">☕ I want cups</button>
+        <button id="modeGrams" type="button" role="radio" aria-checked="false">⚖️ I have coffee (g)</button>
       </div>
       <div id="cupsBlock">
         <div class="stepper">
@@ -135,17 +130,17 @@
         </div>
         <div class="hint">Use whatever beans you have — we'll match the water.</div>
       </div>
-      <div id="inputError" class="err" role="alert" style="display:none"></div>
+      <div id="inputError" class="err" role="alert" aria-live="assertive"></div>
       <div class="sh">
-        <div class="sl" style="margin:0">3 · Strength</div>
+        <div class="sl" style="margin:0" id="strengthLabel">3 · Strength</div>
         <span id="strengthDesc">Balanced — the gold standard</span>
       </div>
       <div class="slider-row">
-        <input type="range" id="strength" min="0" max="2" step="1" value="1" aria-label="Brew strength" aria-valuetext="Medium — the gold standard">
-        <div class="ticks">
-          <span data-val="0" role="button" tabindex="0">Mild</span>
-          <span data-val="1" class="on" role="button" tabindex="0">Medium</span>
-          <span data-val="2" role="button" tabindex="0">Strong</span>
+        <input type="range" id="strength" min="0" max="2" step="1" value="1" aria-labelledby="strengthLabel" aria-valuetext="Medium — the gold standard">
+        <div class="ticks" role="radiogroup" aria-labelledby="strengthLabel">
+          <span data-val="0" role="radio" aria-checked="false" tabindex="0">Mild</span>
+          <span data-val="1" role="radio" aria-checked="true" tabindex="0">Medium</span>
+          <span data-val="2" role="radio" aria-checked="false" tabindex="0">Strong</span>
         </div>
       </div>
     </section>
@@ -155,14 +150,14 @@
       <div class="stat"><div><div class="lbl">Water</div><div class="big" id="waterMl">500<small>ml</small></div></div><div class="conv" id="waterOz">≈ 16.9 fl oz</div></div>
       <div class="stat"><div><div class="lbl">Coffee</div><div class="big" id="coffeeG">33.3<small>g</small></div></div><div class="conv" id="coffeeTbsp">≈ 6.1 tbsp</div></div>
       <div class="bar-wrap">
-        <div class="bar" role="img" aria-label="Coffee to water ratio"><div class="c" id="barCoffee"></div><div class="w" id="barWater"></div></div>
+        <div class="bar" role="img" aria-label="Coffee to water ratio visualization"><div class="c" id="barCoffee"></div><div class="w" id="barWater"></div></div>
         <div class="bar-l"><span><b>1 part</b> coffee</span><span><b id="barParts">15 parts</b> water</span></div>
       </div>
       <div class="actions">
-        <button class="abtn" id="copyBtn" type="button">📋 Copy recipe</button>
-        <button class="abtn" id="resetBtn" type="button">↺ Reset</button>
+        <button class="abtn" id="copyBtn" type="button" aria-label="Copy recipe to clipboard">📋 Copy recipe</button>
+        <button class="abtn" id="resetBtn" type="button" aria-label="Reset all settings to defaults">↺ Reset</button>
       </div>
-      <div class="guide">
+      <div class="guide" aria-label="Brew guide">
         <span class="pill">⚙ Grind <b id="gGrind">Medium-fine</b></span>
         <span class="pill">🌡 <b id="gTemp">94°C / 201°F</b></span>
         <span class="pill">⏱ Brew <b id="gTime">2:30 – 3:30</b></span>
@@ -174,95 +169,91 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
-  "use strict";
-  var M={
-    pourOver:{n:"Pour Over",r:15,ml:250,g:"Medium-fine",t:"94°C / 201°F",tm:"2:30 – 3:30",i:"☕"},
-    frenchPress:{n:"French Press",r:12,ml:300,g:"Coarse",t:"96°C / 205°F",tm:"4:00",i:"🫖"},
-    aeroPress:{n:"AeroPress",r:13,ml:200,g:"Medium-fine",t:"88°C / 190°F",tm:"1:30 – 2:00",i:"💉"},
-    drip:{n:"Drip Machine",r:16,ml:250,g:"Medium",t:"Auto (92–96°C)",tm:"4:30 – 5:30",i:"☕"}
-  };
-  var OFF=[2,0,-2],SD=["Mild — gentle & easy-drinking","Balanced — the gold standard","Strong — bold & rich"],TBSP=5.5,OZ=29.5735;
-  var S={m:"pourOver",md:"cups",c:2,g:30,s:1};
-  function $(i){return document.getElementById(i)}
-  var tt;
-  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},2200)}
+"use strict";
+var METHODS={pourOver:{name:"Pour Over",ratio:15,cupMl:250,grind:"Medium-fine",temp:"94°C / 201°F",time:"2:30 – 3:30",icon:"☕"},frenchPress:{name:"French Press",ratio:12,cupMl:300,grind:"Coarse",temp:"96°C / 205°F",time:"4:00",icon:"🫖"},aeroPress:{name:"AeroPress",ratio:13,cupMl:200,grind:"Medium-fine",temp:"88°C / 190°F",time:"1:30 – 2:00",icon:"⚡"},drip:{name:"Drip Machine",ratio:16,cupMl:250,grind:"Medium",temp:"Auto (92–96°C)",time:"4:30 – 5:30",icon:"☕"}};
+var OFFSETS=[2,0,-2],LABELS=["Mild — gentle & easy-drinking","Balanced — the gold standard","Strong — bold & rich"],TBSP=5.5,OZ=29.5735;
+var CUPS_MIN=0.5,CUPS_MAX=16,GRAMS_MIN=1,GRAMS_MAX=200;
+var state={method:"pourOver",mode:"cups",cups:2,grams:30,strength:1};
+function $(id){return document.getElementById(id)}
+function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v))}
+function fmt(n){return(Math.round(n*10)/10).toString()}
+function parseCups(r){var n=parseFloat(r);if(isNaN(n))return{ok:false,val:CUPS_MIN,err:"Enter a number of cups"};if(n<CUPS_MIN)return{ok:false,val:CUPS_MIN,err:"Minimum is "+CUPS_MIN+" cup"};if(n>CUPS_MAX)return{ok:false,val:CUPS_MAX,err:"Maximum is "+CUPS_MAX+" cups"};return{ok:true,val:Math.round(n*10)/10,err:null}}
+function parseGrams(r){var n=parseFloat(r);if(isNaN(n))return{ok:false,val:GRAMS_MIN,err:"Enter grams of coffee"};if(n<=0)return{ok:false,val:GRAMS_MIN,err:"Must be at least "+GRAMS_MIN+"g"};if(n>GRAMS_MAX)return{ok:false,val:GRAMS_MAX,err:"Maximum is "+GRAMS_MAX+"g"};return{ok:true,val:Math.round(n),err:null}}
+function calc(s){
+var m=METHODS[s.method],r=m.ratio+OFFSETS[s.strength],w,c;
+if(s.mode==="cups"){w=s.cups*m.cupMl;c=w/r}else{c=s.grams;w=c*r}
+return{methodName:m.name,ratio:r,waterMl:Math.round(w),floz:w/OZ,coffeeGrams:c>=100?Math.round(c):Math.round(c*10)/10,tbsp:c/TBSP,grind:m.grind,temp:m.temp,time:m.time,cupMl:m.cupMl}
+}
+var tt;
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},2200)}
+function showError(m){var e=$("inputError");if(m){e.textContent=m;e.style.display="block"}else{e.textContent="";e.style.display="none"}}
+function setBumped(id,h){var e=$(id);if(e.innerHTML!==h){e.innerHTML=h;e.classList.remove("bump");void e.offsetWidth;e.classList.add("bump")}}
 
-  var mw=$("methods");
-  Object.keys(M).forEach(function(k){
-    var m=M[k],b=document.createElement("button");
-    b.type="button";b.className="method"+(k===S.m?" selected":"");
-    b.setAttribute("role","radio");b.setAttribute("aria-checked",k===S.m?"true":"false");
-    b.innerHTML='<span class="icon">'+m.i+'</span><span class="mn">'+m.n+'</span><span class="mr">1 : '+m.r+'</span>';
-    b.addEventListener("click",function(){
-      S.m=k;mw.querySelectorAll(".method").forEach(function(x){x.classList.remove("selected");x.setAttribute("aria-checked","false")});
-      b.classList.add("selected");b.setAttribute("aria-checked","true");
-      $("cupNote").textContent="1 cup ≈ "+M[k].ml+" ml of brewed coffee";render()
-    });mw.appendChild(b)
-  });
+var methodsWrap=$("methods");
+Object.keys(METHODS).forEach(function(k){
+var m=METHODS[k],b=document.createElement("button");
+b.type="button";b.className="method";b.setAttribute("role","radio");b.setAttribute("aria-checked",k===state.method?"true":"false");
+b.innerHTML='<span class="icon">'+m.icon+'</span><span class="mn">'+m.name+'</span><span class="mr">1 : '+m.ratio+'</span>';
+b.addEventListener("click",function(){state.method=k;updateMethods();$("cupNote").textContent="1 cup ≈ "+METHODS[k].cupMl+" ml of brewed coffee";render()});
+methodsWrap.appendChild(b);
+});
+function updateMethods(){var bs=methodsWrap.querySelectorAll(".method"),ks=Object.keys(METHODS);bs.forEach(function(b,i){var sel=ks[i]===state.method;b.setAttribute("aria-checked",sel?"true":"false");b.setAttribute("tabindex",sel?"0":"-1")})}
 
-  function setMode(md){
-    S.md=md;$("modeCups").classList.toggle("on",md==="cups");$("modeGrams").classList.toggle("on",md==="grams");
-    $("modeCups").setAttribute("aria-selected",md==="cups"?"true":"false");$("modeGrams").setAttribute("aria-selected",md==="grams"?"true":"false");
-    $("cupsBlock").style.display=md==="cups"?"":"none";$("gramsBlock").style.display=md==="grams"?"":"none";render()
-  }
-  $("modeCups").addEventListener("click",function(){setMode("cups")});
-  $("modeGrams").addEventListener("click",function(){setMode("grams")});
+function setMode(md){state.mode=md;$("modeCups").setAttribute("aria-checked",md==="cups"?"true":"false");$("modeGrams").setAttribute("aria-checked",md==="grams"?"true":"false");$("cupsBlock").style.display=md==="cups"?"":"none";$("gramsBlock").style.display=md==="grams"?"":"none";render()}
+$("modeCups").addEventListener("click",function(){setMode("cups")});
+$("modeGrams").addEventListener("click",function(){setMode("grams")});
+$("modeGroup").addEventListener("keydown",function(e){if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();setMode(state.mode==="cups"?"grams":"cups");$(state.mode==="cups"?"modeCups":"modeGrams").focus()}});
 
-  document.querySelectorAll(".step-btn").forEach(function(b){
-    b.addEventListener("click",function(){
-      var t=b.dataset.target,d=parseFloat(b.dataset.step);
-      if(t==="cups"){S.c=cl(S.c+d,.5,16);$("cupsInput").value=tn(S.c)}else{S.g=cl(S.g+d,1,200);$("gramsInput").value=tn(S.g)}
-      ce();render()
-    })
-  });
+document.querySelectorAll(".step-btn").forEach(function(b){
+b.addEventListener("click",function(){
+var t=b.dataset.target,d=parseFloat(b.dataset.step);
+if(t==="cups"){state.cups=clamp(Math.round((state.cups+d)*10)/10,CUPS_MIN,CUPS_MAX);$("cupsInput").value=fmt(state.cups)}
+else{state.grams=clamp(Math.round(state.grams+d),GRAMS_MIN,GRAMS_MAX);$("gramsInput").value=fmt(state.grams)}
+showError(null);render()})
+});
 
-  function hci(v){if(isNaN(v)||v===""){S.c=.5;se("Minimum is 0.5 cups");return}ce();S.c=v}
-  function hgi(v){if(isNaN(v)||v===""){S.g=1;se("Minimum is 1 gram");return}ce();S.g=v}
+$("cupsInput").addEventListener("input",function(e){var r=parseCups(e.target.value);state.cups=r.val;showError(r.ok?null:r.err);render()});
+$("cupsInput").addEventListener("blur",function(e){var r=parseCups(e.target.value);state.cups=r.val;e.target.value=fmt(state.cups);showError(null);render()});
+$("gramsInput").addEventListener("input",function(e){var r=parseGrams(e.target.value);state.grams=r.val;showError(r.ok?null:r.err);render()});
+$("gramsInput").addEventListener("blur",function(e){var r=parseGrams(e.target.value);state.grams=r.val;e.target.value=fmt(state.grams);showError(null);render()});
 
-  $("cupsInput").addEventListener("input",function(e){hci(parseFloat(e.target.value));render()});
-  $("cupsInput").addEventListener("blur",function(e){S.c=cl(S.c||1,.5,16);e.target.value=tn(S.c);ce();render()});
-  $("gramsInput").addEventListener("input",function(e){hgi(parseFloat(e.target.value));render()});
-  $("gramsInput").addEventListener("blur",function(e){S.g=cl(S.g||15,1,200);e.target.value=tn(S.g);ce();render()});
+var sl=$("strength"),ticks=document.querySelectorAll(".ticks span");
+function setS(v){state.strength=v;sl.value=v;$("strengthDesc").textContent=LABELS[v];sl.setAttribute("aria-valuetext",LABELS[v]);ticks.forEach(function(s){s.setAttribute("aria-checked",+s.dataset.val===v?"true":"false")});render()}
+sl.addEventListener("input",function(){setS(+sl.value)});
+ticks.forEach(function(s){
+s.addEventListener("click",function(){setS(+s.dataset.val)});
+s.addEventListener("keydown",function(e){
+if(e.key==="Enter"||e.key===" "){e.preventDefault();setS(+s.dataset.val)}
+if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();var next=clamp(state.strength+(e.key==="ArrowRight"?1:-1),0,2);setS(next);ticks[next].focus()}
+})});
 
-  function se(m){var e=$("inputError");e.textContent=m;e.style.display="block"}
-  function ce(){$("inputError").style.display="none"}
+$("copyBtn").addEventListener("click",function(){
+var r=calc(state);
+var txt=r.methodName+" Recipe\nRatio: 1:"+r.ratio+"\nCoffee: "+r.coffeeGrams+"g\nWater: "+r.waterMl+"ml\nGrind: "+r.grind+"\nTemp: "+r.temp+"\nBrew time: "+r.time;
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast("Recipe copied!")},function(){fc(txt)})}
+else fc(txt)
+});
+function fc(t){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;left:-9999px;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("Recipe copied!")}catch(e){toast("Copy failed")}document.body.removeChild(a)}
 
-  var sl=$("strength"),ts=document.querySelectorAll(".ticks span");
-  function setS(v){S.s=v;sl.value=v;$("strengthDesc").textContent=SD[v];sl.setAttribute("aria-valuetext",SD[v]);ts.forEach(function(s){s.classList.toggle("on",+s.dataset.val===v)});render()}
-  sl.addEventListener("input",function(){setS(+sl.value)});
-  ts.forEach(function(s){s.addEventListener("click",function(){setS(+s.dataset.val)});s.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();setS(+s.dataset.val)}})});
+$("resetBtn").addEventListener("click",function(){
+state.method="pourOver";state.mode="cups";state.cups=2;state.grams=30;state.strength=1;
+$("cupsInput").value="2";$("gramsInput").value="30";setMode("cups");updateMethods();
+$("cupNote").textContent="1 cup ≈ "+METHODS.pourOver.cupMl+" ml of brewed coffee";setS(1);showError(null);toast("Reset to defaults")
+});
 
-  $("copyBtn").addEventListener("click",function(){
-    var m=M[S.m],r=m.r+OFF[S.s],w,c;
-    if(S.md==="cups"){w=S.c*m.ml;c=w/r}else{c=S.g;w=c*r}
-    var txt=m.n+" Recipe\nRatio: 1:"+r+"\nCoffee: "+(c>=100?Math.round(c):(Math.round(c*10)/10))+"g\nWater: "+Math.round(w)+"ml\nGrind: "+m.g+"\nTemp: "+m.t+"\nBrew time: "+m.tm;
-    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){toast("Recipe copied!")});else toast("Copy not supported")
-  });
-
-  $("resetBtn").addEventListener("click",function(){
-    S.m="pourOver";S.md="cups";S.c=2;S.g=30;S.s=1;
-    $("cupsInput").value="2";$("gramsInput").value="30";setMode("cups");
-    mw.querySelectorAll(".method").forEach(function(b,i){b.classList.toggle("selected",i===0);b.setAttribute("aria-checked",i===0?"true":"false")});
-    $("cupNote").textContent="1 cup ≈ "+M.pourOver.ml+" ml of brewed coffee";setS(1);toast("Reset to defaults")
-  });
-
-  function cl(n,a,b){return Math.min(b,Math.max(a,n))}
-  function tn(n){return(Math.round(n*10)/10).toString()}
-  function bump(e){e.classList.remove("bump");void e.offsetWidth;e.classList.add("bump")}
-
-  function render(){
-    var m=M[S.m],r=m.r+OFF[S.s],w,c;
-    if(S.md==="cups"){w=S.c*m.ml;c=w/r}else{c=S.g;w=c*r}
-    var wr=Math.round(w),oz=(w/OZ).toFixed(1),cr=c>=100?Math.round(c):(Math.round(c*10)/10).toFixed(1),ts=(c/TBSP).toFixed(1);
-    sb("waterMl",wr.toLocaleString("en-US")+"<small>ml</small>");sb("waterOz","≈ "+oz+" fl oz");
-    sb("coffeeG",cr+"<small>g</small>");sb("coffeeTbsp","≈ "+ts+" tbsp");sb("ratioChip","1 : "+r);
-    $("methodName").textContent=m.n;
-    $("methodSub").textContent=S.md==="cups"?tn(S.c)+" cup"+(S.c===1?"":"s")+" × "+m.ml+" ml, at "+SD[S.s].split(" — ")[0].toLowerCase()+" strength":tn(S.g)+" g of coffee, at "+SD[S.s].split(" — ")[0].toLowerCase()+" strength";
-    var cp=(100/(1+r)).toFixed(2);$("barCoffee").style.width=cp+"%";$("barWater").style.width=(100-cp)+"%";$("barParts").textContent=r+" parts";
-    $("gGrind").textContent=m.g;$("gTemp").textContent=m.t;$("gTime").textContent=m.tm
-  }
-  function sb(i,h){var e=$(i);if(e.innerHTML!==h){e.innerHTML=h;bump(e)}}
-  render()
+function render(){
+var r=calc(state);
+setBumped("waterMl",r.waterMl.toLocaleString("en-US")+"<small>ml</small>");
+setBumped("waterOz","\u2248 "+r.floz.toFixed(1)+" fl oz");
+setBumped("coffeeG",r.coffeeGrams+"<small>g</small>");
+setBumped("coffeeTbsp","\u2248 "+r.tbsp.toFixed(1)+" tbsp");
+setBumped("ratioChip","1 : "+r.ratio);
+$("methodName").textContent=r.methodName;
+$("methodSub").textContent=state.mode==="cups"?fmt(state.cups)+" cup"+(state.cups===1?"":"s")+" \u00d7 "+r.cupMl+" ml, at "+LABELS[state.strength].split(" \u2014 ")[0].toLowerCase()+" strength":fmt(state.grams)+" g of coffee, at "+LABELS[state.strength].split(" \u2014 ")[0].toLowerCase()+" strength";
+var cp=(100/(1+r.ratio)).toFixed(2);$("barCoffee").style.width=cp+"%";$("barWater").style.width=(100-cp)+"%";$("barParts").textContent=r.ratio+" parts";
+$("gGrind").textContent=r.grind;$("gTemp").textContent=r.temp;$("gTime").textContent=r.time
+}
+render()
 })();
 </script>
 </body>
