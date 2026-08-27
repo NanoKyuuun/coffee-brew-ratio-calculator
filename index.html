@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brew Ratio Calculator</title>
+<meta name="description" content="Dial in the perfect coffee-to-water ratio for any brew method. Free, instant, works offline.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.8/700.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.8/600.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/400.css">
@@ -15,8 +17,10 @@
     --ink-soft:#7a6a55; --amber:#c98a3d; --amber-deep:#a8681f;
     --amber-soft:#fdf3e2; --dark:#241609; --dark-2:#3a2413;
     --milk:#f5e9d7; --gold:#e3a857; --water:#6f9bb3;
+    --radius:18px; --radius-sm:12px; --shadow:0 14px 34px rgba(66,42,17,.09);
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+  *,*::before,*::after{box-sizing:border-box; margin:0; padding:0;}
+
   body{
     font-family:'Inter',system-ui,sans-serif;
     background:var(--cream);
@@ -24,12 +28,22 @@
     background-size:24px 24px;
     color:var(--ink);
     min-height:100vh;
-    padding:40px 20px 60px;
+    padding:clamp(24px,5vw,48px) clamp(16px,4vw,20px) 60px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
   }
   .wrap{max-width:1040px; margin:0 auto;}
 
+  /* ---------- Focus (keyboard) ---------- */
+  :focus-visible{outline:2.5px solid var(--amber); outline-offset:3px; border-radius:6px;}
+  button:focus-visible{outline-offset:4px;}
+
+  /* ---------- Skip link ---------- */
+  .skip{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; z-index:999;}
+  .skip:focus{position:fixed; top:16px; left:16px; width:auto; height:auto; background:var(--ink); color:#fff; padding:10px 18px; border-radius:var(--radius-sm); font-weight:600; font-size:14px; z-index:9999; box-shadow:0 6px 20px rgba(0,0,0,.3);}
+
   /* ---------- Header ---------- */
-  header{margin-bottom:32px; text-align:left;}
+  header{margin-bottom:36px; text-align:left;}
   .badge{
     display:inline-flex; align-items:center; gap:8px;
     background:#fff8ec; border:1px solid #eedbb8; color:var(--amber-deep);
@@ -40,10 +54,10 @@
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
   h1{
     font-family:'Fraunces',serif; font-weight:700;
-    font-size:clamp(30px,5vw,44px); line-height:1.1; letter-spacing:-.01em;
+    font-size:clamp(28px,5vw,44px); line-height:1.1; letter-spacing:-.01em;
   }
   h1 em{font-style:italic; color:var(--amber-deep);}
-  .tag{color:var(--ink-soft); margin-top:8px; font-size:15px;}
+  .tag{color:var(--ink-soft); margin-top:8px; font-size:clamp(14px,2vw,15px); line-height:1.5;}
 
   /* ---------- Layout ---------- */
   .grid{display:grid; grid-template-columns:1.05fr .95fr; gap:22px; align-items:start;}
@@ -51,8 +65,10 @@
 
   .card{
     background:var(--card); border:1px solid var(--line); border-radius:22px;
-    padding:26px; box-shadow:0 14px 34px rgba(66,42,17,.09);
+    padding:clamp(20px,3vw,28px); box-shadow:var(--shadow);
+    transition:box-shadow .25s ease;
   }
+  .card:hover{box-shadow:0 18px 42px rgba(66,42,17,.12);}
   .section-label{
     font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
     color:var(--ink-soft); margin-bottom:10px;
@@ -63,11 +79,12 @@
   @media(max-width:420px){.methods{grid-template-columns:1fr;}}
   .method{
     display:flex; flex-direction:column; gap:6px; text-align:left;
-    background:#fff; border:1.5px solid var(--line); border-radius:16px;
+    background:#fff; border:1.5px solid var(--line); border-radius:var(--radius);
     padding:14px; cursor:pointer; transition:all .18s ease;
     font-family:inherit; color:var(--ink);
   }
-  .method:hover{border-color:#d8bf9a; transform:translateY(-2px);}
+  .method:hover{border-color:#d8bf9a; transform:translateY(-2px); box-shadow:0 6px 16px rgba(66,42,17,.08);}
+  .method:active{transform:translateY(0);}
   .method.selected{
     border-color:var(--amber); background:var(--amber-soft);
     box-shadow:0 6px 16px rgba(201,138,61,.18);
@@ -88,7 +105,7 @@
   }
   .seg button{
     flex:1; border:none; background:transparent; font-family:inherit; font-weight:600;
-    font-size:13.5px; padding:9px 6px; border-radius:999px; cursor:pointer;
+    font-size:clamp(12.5px,1.8vw,13.5px); padding:9px 6px; border-radius:999px; cursor:pointer;
     color:var(--ink-soft); transition:all .18s;
   }
   .seg button.on{background:#fff; color:var(--ink); box-shadow:0 2px 6px rgba(70,45,20,.14);}
@@ -96,7 +113,7 @@
   /* ---------- Stepper input ---------- */
   .stepper{display:flex; align-items:stretch; gap:8px; margin-bottom:6px;}
   .step-btn{
-    width:52px; border-radius:14px; border:1.5px solid var(--line); background:#fff;
+    width:52px; border-radius:var(--radius-sm); border:1.5px solid var(--line); background:#fff;
     font-size:22px; font-weight:600; color:var(--amber-deep); cursor:pointer;
     transition:all .15s; font-family:inherit;
   }
@@ -104,7 +121,8 @@
   .step-btn:active{transform:scale(.94);}
   .num-field{
     flex:1; display:flex; align-items:baseline; justify-content:center; gap:8px;
-    background:#fdf9f1; border:1.5px solid var(--line); border-radius:14px; padding:8px 14px;
+    background:#fdf9f1; border:1.5px solid var(--line); border-radius:var(--radius-sm); padding:8px 14px;
+    transition:border-color .2s, box-shadow .2s;
   }
   .num-field:focus-within{border-color:var(--amber); box-shadow:0 0 0 4px rgba(201,138,61,.15);}
   .num-field input{
@@ -115,15 +133,17 @@
   .num-field input::-webkit-inner-spin-button,.num-field input::-webkit-outer-spin-button{-webkit-appearance:none;}
   .unit{font-size:14px; font-weight:600; color:var(--ink-soft);}
   .hint{font-size:12.5px; color:var(--ink-soft); margin-bottom:22px;}
+  .input-error{color:#c0392b; font-weight:600; font-size:12.5px; margin-bottom:22px;}
 
   /* ---------- Strength slider ---------- */
   .strength-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;}
-  #strengthDesc{font-size:12.5px; color:var(--amber-deep); font-weight:600;}
+  #strengthDesc{font-size:12.5px; color:var(--amber-deep); font-weight:600; transition:color .2s;}
   .slider-row{position:relative; padding-bottom:26px;}
   input[type=range]{
     -webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:99px;
     background:linear-gradient(to right,#ecd9b8,#c98a3d); outline:none; cursor:pointer;
   }
+  input[type=range]:focus-visible{box-shadow:0 0 0 4px rgba(201,138,61,.25);}
   input[type=range]::-webkit-slider-thumb{
     -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
     background:#fff; border:3px solid var(--amber-deep);
@@ -137,16 +157,29 @@
   .ticks{display:flex; justify-content:space-between; margin-top:10px;}
   .ticks span{
     font-size:12px; font-weight:600; color:#b3a186; cursor:pointer; transition:color .15s;
-    flex:1; text-align:center;
+    flex:1; text-align:center; padding:4px 0; border-radius:6px;
   }
   .ticks span:first-child{text-align:left;}
   .ticks span:last-child{text-align:right;}
+  .ticks span:hover{color:var(--amber-deep);}
   .ticks span.on{color:var(--amber-deep);}
+
+  /* ---------- Actions bar ---------- */
+  .actions{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
+  .act-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.08); border:1px solid rgba(245,233,215,.18);
+    border-radius:999px; padding:8px 16px; color:#e8d7bc; font-family:inherit;
+    font-size:13px; font-weight:600; cursor:pointer; transition:all .18s;
+  }
+  .act-btn:hover{background:rgba(255,255,255,.14); color:#fdf6ea; transform:translateY(-1px);}
+  .act-btn:active{transform:scale(.96);}
+  .act-btn svg{flex-shrink:0;}
 
   /* ---------- Results ---------- */
   .results{
     background:linear-gradient(160deg,var(--dark-2) 0%,var(--dark) 70%);
-    border:1px solid #4a3220; border-radius:22px; padding:28px;
+    border:1px solid #4a3220; border-radius:22px; padding:clamp(22px,3vw,28px);
     color:var(--milk); box-shadow:0 18px 40px rgba(46,28,12,.28);
     position:relative; overflow:hidden;
   }
@@ -156,21 +189,21 @@
   }
   .results h2{
     font-family:'Fraunces',serif; font-size:20px; font-weight:600; margin-bottom:4px;
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
   }
   .ratio-chip{
     font-family:'Inter',sans-serif; font-size:13px; font-weight:600; letter-spacing:.04em;
     background:rgba(227,168,87,.16); border:1px solid rgba(227,168,87,.45); color:var(--gold);
     padding:5px 13px; border-radius:999px; font-variant-numeric:tabular-nums;
   }
-  .r-sub{font-size:13px; color:#b79d7e; margin-bottom:22px;}
+  .r-sub{font-size:13px; color:#b79d7e; margin-bottom:22px; line-height:1.4;}
   .stat{
     display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
     padding:18px 0; border-top:1px solid rgba(245,233,215,.12);
   }
   .stat .lbl{font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:#b79d7e; margin-bottom:6px;}
   .big{
-    font-family:'Fraunces',serif; font-weight:700; font-size:clamp(34px,6vw,46px);
+    font-family:'Fraunces',serif; font-weight:700; font-size:clamp(30px,6vw,46px);
     line-height:1; color:#fdf6ea; font-variant-numeric:tabular-nums;
   }
   .big small{font-size:.45em; font-weight:600; color:#cbb08c; margin-left:4px;}
@@ -193,19 +226,40 @@
     display:inline-flex; align-items:center; gap:7px; font-size:12.5px;
     background:rgba(255,255,255,.06); border:1px solid rgba(245,233,215,.14);
     border-radius:999px; padding:7px 13px; color:#e8d7bc;
+    transition:background .15s;
   }
+  .pill:hover{background:rgba(255,255,255,.1);}
   .pill svg{color:var(--gold); flex-shrink:0;}
   .pill b{color:#fdf6ea; font-weight:600;}
 
-  footer{margin-top:26px; text-align:center; font-size:12.5px; color:#a4917a;}
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 24px; border-radius:999px;
+    font-size:14px; font-weight:600; box-shadow:0 8px 28px rgba(0,0,0,.28);
+    opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.4,0,.2,1);
+    z-index:9999; white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* ---------- Footer ---------- */
+  footer{margin-top:28px; text-align:center; font-size:12.5px; color:#a4917a; line-height:1.6;}
   footer b{color:#8a7458;}
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff; padding:0;}
+    .card,.skip,.actions{display:none;}
+    .results{box-shadow:none; border:1px solid #ccc;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<a href="#controls" class="skip">Skip to controls</a>
 
+<div class="wrap">
   <header>
-    <div class="badge"><span class="dot"></span> Instant · No sign-up · Works offline-ish</div>
+    <div class="badge"><span class="dot"></span> Instant · No sign-up · Works offline</div>
     <h1>Coffee Brew <em>Ratio</em> Calculator</h1>
     <p class="tag">Dial in the perfect cup — pick a method, tell us your target, and get exact grams &amp; millilitres.</p>
   </header>
@@ -213,50 +267,52 @@
   <div class="grid">
 
     <!-- CONTROLS -->
-    <section class="card" aria-label="Brew settings">
+    <section class="card" id="controls" aria-label="Brew settings">
       <div class="section-label">1 · Brew method</div>
       <div class="methods" id="methods" role="radiogroup" aria-label="Brew method"></div>
 
       <div class="section-label">2 · What are you measuring?</div>
-      <div class="seg" role="tablist">
-        <button id="modeCups" class="on" type="button">☕ I want cups</button>
-        <button id="modeGrams" type="button">⚖️ I have coffee (g)</button>
+      <div class="seg" role="tablist" aria-label="Measurement mode">
+        <button id="modeCups" class="on" type="button" role="tab" aria-selected="true">☕ I want cups</button>
+        <button id="modeGrams" type="button" role="tab" aria-selected="false">⚖️ I have coffee (g)</button>
       </div>
 
       <div id="cupsBlock">
         <div class="stepper">
-          <button class="step-btn" type="button" data-step="-0.5" data-target="cups">−</button>
+          <button class="step-btn" type="button" data-step="-0.5" data-target="cups" aria-label="Decrease cups">−</button>
           <div class="num-field">
-            <input id="cupsInput" type="number" min="0.5" max="16" step="0.5" value="2" inputmode="decimal">
+            <input id="cupsInput" type="number" min="0.5" max="16" step="0.5" value="2" inputmode="decimal" aria-label="Number of cups">
             <span class="unit" id="cupsUnit">cups</span>
           </div>
-          <button class="step-btn" type="button" data-step="0.5" data-target="cups">+</button>
+          <button class="step-btn" type="button" data-step="0.5" data-target="cups" aria-label="Increase cups">+</button>
         </div>
         <div class="hint" id="cupNote">1 cup ≈ 250 ml of brewed coffee</div>
       </div>
 
       <div id="gramsBlock" style="display:none;">
         <div class="stepper">
-          <button class="step-btn" type="button" data-step="-1" data-target="grams">−</button>
+          <button class="step-btn" type="button" data-step="-1" data-target="grams" aria-label="Decrease grams">−</button>
           <div class="num-field">
-            <input id="gramsInput" type="number" min="1" max="200" step="1" value="30" inputmode="decimal">
+            <input id="gramsInput" type="number" min="1" max="200" step="1" value="30" inputmode="decimal" aria-label="Grams of coffee">
             <span class="unit">grams of coffee</span>
           </div>
-          <button class="step-btn" type="button" data-step="1" data-target="grams">+</button>
+          <button class="step-btn" type="button" data-step="1" data-target="grams" aria-label="Increase grams">+</button>
         </div>
         <div class="hint">Use whatever beans you have — we'll match the water.</div>
       </div>
+
+      <div id="inputError" class="input-error" role="alert" style="display:none;"></div>
 
       <div class="strength-head">
         <div class="section-label" style="margin:0;">3 · Strength</div>
         <span id="strengthDesc">Balanced — the gold standard</span>
       </div>
       <div class="slider-row">
-        <input type="range" id="strength" min="0" max="2" step="1" value="1" aria-label="Brew strength">
+        <input type="range" id="strength" min="0" max="2" step="1" value="1" aria-label="Brew strength" aria-valuetext="Medium — the gold standard">
         <div class="ticks">
-          <span data-val="0">Mild</span>
-          <span data-val="1" class="on">Medium</span>
-          <span data-val="2">Strong</span>
+          <span data-val="0" role="button" tabindex="0">Mild</span>
+          <span data-val="1" class="on" role="button" tabindex="0">Medium</span>
+          <span data-val="2" role="button" tabindex="0">Strong</span>
         </div>
       </div>
     </section>
@@ -283,11 +339,22 @@
       </div>
 
       <div class="bar-wrap">
-        <div class="bar">
+        <div class="bar" role="img" aria-label="Coffee to water ratio visualization">
           <div class="c" id="barCoffee"></div>
           <div class="w" id="barWater"></div>
         </div>
         <div class="bar-legend"><span><b>1 part</b> coffee</span><span><b id="barParts">15 parts</b> water</span></div>
+      </div>
+
+      <div class="actions">
+        <button class="act-btn" id="copyBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy recipe
+        </button>
+        <button class="act-btn" id="resetBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Reset
+        </button>
       </div>
 
       <div class="guide">
@@ -310,11 +377,13 @@
   <footer>Conversions: <b>1 tbsp ≈ 5.5 g</b> of ground coffee · <b>1 fl oz ≈ 29.6 ml</b> · Ratios are starting points — tweak to taste.</footer>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
 (function(){
   "use strict";
 
-  const METHODS = {
+  var METHODS = {
     pourOver:    { name:"Pour Over",    ratio:15, cupMl:250, grind:"Medium-fine", temp:"94°C / 201°F", time:"2:30 – 3:30",
       icon:'<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14h26l-9 16h-8z"/><path d="M22 33v3"/><circle cx="24" cy="39" r="1.4" fill="currentColor" stroke="none"/><path d="M14 43h20"/></svg>' },
     frenchPress: { name:"French Press", ratio:12, cupMl:300, grind:"Coarse", temp:"96°C / 205°F", time:"4:00",
@@ -325,19 +394,29 @@
       icon:'<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="7" width="26" height="34" rx="4"/><path d="M11 15h26"/><path d="M24 18v4" stroke-dasharray="2 3"/><path d="M19 26h9l-1.4 9h-6.2z"/></svg>' }
   };
 
-  const OFFSETS = [2, 0, -2];
-  const STRENGTH_DESC = ["Mild — gentle & easy-drinking","Balanced — the gold standard","Strong — bold & rich"];
-  const TBSP_G = 5.5, ML_PER_OZ = 29.5735;
+  var OFFSETS = [2, 0, -2];
+  var STRENGTH_DESC = ["Mild — gentle & easy-drinking","Balanced — the gold standard","Strong — bold & rich"];
+  var TBSP_G = 5.5, ML_PER_OZ = 29.5735;
 
-  const state = { method:"pourOver", mode:"cups", cups:2, grams:30, strength:1 };
+  var state = { method:"pourOver", mode:"cups", cups:2, grams:30, strength:1 };
 
-  const $ = id => document.getElementById(id);
+  function $(id){ return document.getElementById(id); }
+
+  /* ---- Toast ---- */
+  var toastTimer;
+  function showToast(msg){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
 
   /* ---- Build method cards ---- */
-  const methodsWrap = $("methods");
-  Object.keys(METHODS).forEach(key => {
-    const m = METHODS[key];
-    const btn = document.createElement("button");
+  var methodsWrap = $("methods");
+  Object.keys(METHODS).forEach(function(key){
+    var m = METHODS[key];
+    var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "method" + (key === state.method ? " selected" : "");
     btn.setAttribute("role","radio");
@@ -346,9 +425,9 @@
       '<span class="icon">' + m.icon + '</span>' +
       '<span class="m-name">' + m.name + '</span>' +
       '<span class="m-ratio">1 : ' + m.ratio + '</span>';
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", function(){
       state.method = key;
-      methodsWrap.querySelectorAll(".method").forEach(b => { b.classList.remove("selected"); b.setAttribute("aria-checked","false"); });
+      methodsWrap.querySelectorAll(".method").forEach(function(b){ b.classList.remove("selected"); b.setAttribute("aria-checked","false"); });
       btn.classList.add("selected");
       btn.setAttribute("aria-checked","true");
       $("cupNote").textContent = "1 cup ≈ " + METHODS[key].cupMl + " ml of brewed coffee";
@@ -362,53 +441,140 @@
     state.mode = mode;
     $("modeCups").classList.toggle("on", mode === "cups");
     $("modeGrams").classList.toggle("on", mode === "grams");
+    $("modeCups").setAttribute("aria-selected", mode === "cups" ? "true" : "false");
+    $("modeGrams").setAttribute("aria-selected", mode === "grams" ? "true" : "false");
     $("cupsBlock").style.display = mode === "cups" ? "" : "none";
     $("gramsBlock").style.display = mode === "grams" ? "" : "none";
     render();
   }
-  $("modeCups").addEventListener("click", () => setMode("cups"));
-  $("modeGrams").addEventListener("click", () => setMode("grams"));
+  $("modeCups").addEventListener("click", function(){ setMode("cups"); });
+  $("modeGrams").addEventListener("click", function(){ setMode("grams"); });
 
   /* ---- Steppers ---- */
-  document.querySelectorAll(".step-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.target;
-      const delta = parseFloat(btn.dataset.step);
+  document.querySelectorAll(".step-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var target = btn.dataset.target;
+      var delta = parseFloat(btn.dataset.step);
       if(target === "cups"){ state.cups = clamp(state.cups + delta, 0.5, 16); $("cupsInput").value = trimNum(state.cups); }
       else { state.grams = clamp(state.grams + delta, 1, 200); $("gramsInput").value = trimNum(state.grams); }
+      clearError();
       render();
     });
   });
 
-  $("cupsInput").addEventListener("input", e => {
-    const v = parseFloat(e.target.value);
-    if(!isNaN(v)) { state.cups = v; render(); }
+  function handleCupsInput(v){
+    if(isNaN(v) || v === ""){
+      state.cups = 0.5;
+      showError("Minimum is 0.5 cups");
+      return;
+    }
+    clearError();
+    state.cups = v;
+  }
+  function handleGramsInput(v){
+    if(isNaN(v) || v === ""){
+      state.grams = 1;
+      showError("Minimum is 1 gram");
+      return;
+    }
+    clearError();
+    state.grams = v;
+  }
+
+  $("cupsInput").addEventListener("input", function(e){
+    var v = parseFloat(e.target.value);
+    handleCupsInput(v);
+    render();
   });
-  $("cupsInput").addEventListener("blur", e => {
+  $("cupsInput").addEventListener("blur", function(e){
     state.cups = clamp(state.cups || 1, 0.5, 16);
-    e.target.value = trimNum(state.cups); render();
+    e.target.value = trimNum(state.cups);
+    clearError();
+    render();
   });
-  $("gramsInput").addEventListener("input", e => {
-    const v = parseFloat(e.target.value);
-    if(!isNaN(v)) { state.grams = v; render(); }
+  $("gramsInput").addEventListener("input", function(e){
+    var v = parseFloat(e.target.value);
+    handleGramsInput(v);
+    render();
   });
-  $("gramsInput").addEventListener("blur", e => {
+  $("gramsInput").addEventListener("blur", function(e){
     state.grams = clamp(state.grams || 15, 1, 200);
-    e.target.value = trimNum(state.grams); render();
+    e.target.value = trimNum(state.grams);
+    clearError();
+    render();
   });
 
+  /* ---- Error display ---- */
+  function showError(msg){
+    var el = $("inputError");
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+  function clearError(){ $("inputError").style.display = "none"; }
+
   /* ---- Strength ---- */
-  const strengthEl = $("strength");
-  const tickSpans = document.querySelectorAll(".ticks span");
+  var strengthEl = $("strength");
+  var tickSpans = document.querySelectorAll(".ticks span");
   function setStrength(v){
     state.strength = v;
     strengthEl.value = v;
     $("strengthDesc").textContent = STRENGTH_DESC[v];
-    tickSpans.forEach(s => s.classList.toggle("on", +s.dataset.val === v));
+    strengthEl.setAttribute("aria-valuetext", STRENGTH_DESC[v]);
+    tickSpans.forEach(function(s){ s.classList.toggle("on", +s.dataset.val === v); });
     render();
   }
-  strengthEl.addEventListener("input", () => setStrength(+strengthEl.value));
-  tickSpans.forEach(s => s.addEventListener("click", () => setStrength(+s.dataset.val)));
+  strengthEl.addEventListener("input", function(){ setStrength(+strengthEl.value); });
+  tickSpans.forEach(function(s){
+    s.addEventListener("click", function(){ setStrength(+s.dataset.val); });
+    s.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); setStrength(+s.dataset.val); }
+    });
+  });
+
+  /* ---- Copy recipe ---- */
+  $("copyBtn").addEventListener("click", function(){
+    var m = METHODS[state.method];
+    var ratio = m.ratio + OFFSETS[state.strength];
+    var waterMl, coffeeG;
+    if(state.mode === "cups"){
+      waterMl = state.cups * m.cupMl;
+      coffeeG = waterMl / ratio;
+    } else {
+      coffeeG = state.grams;
+      waterMl = coffeeG * ratio;
+    }
+    var waterR = Math.round(waterMl);
+    var coffeeR = coffeeG >= 100 ? Math.round(coffeeG) : (Math.round(coffeeG * 10) / 10);
+    var text =
+      m.name + " Recipe" + "\n" +
+      "Ratio: 1:" + ratio + "\n" +
+      "Coffee: " + coffeeR + "g" + "\n" +
+      "Water: " + waterR + "ml" + "\n" +
+      "Grind: " + m.grind + "\n" +
+      "Temp: " + m.temp + "\n" +
+      "Brew time: " + m.time;
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ showToast("Recipe copied!"); });
+    } else {
+      showToast("Copy not supported in this browser");
+    }
+  });
+
+  /* ---- Reset ---- */
+  $("resetBtn").addEventListener("click", function(){
+    state.method = "pourOver"; state.mode = "cups"; state.cups = 2; state.grams = 30; state.strength = 1;
+    $("cupsInput").value = "2"; $("gramsInput").value = "30";
+    setMode("cups");
+    var firstBtn = methodsWrap.querySelector(".method");
+    methodsWrap.querySelectorAll(".method").forEach(function(b,i){
+      b.classList.toggle("selected", i === 0);
+      b.setAttribute("aria-checked", i === 0 ? "true" : "false");
+    });
+    $("cupNote").textContent = "1 cup ≈ " + METHODS.pourOver.cupMl + " ml of brewed coffee";
+    setStrength(1);
+    showToast("Reset to defaults");
+  });
 
   /* ---- Helpers ---- */
   function clamp(n, lo, hi){ return Math.min(hi, Math.max(lo, n)); }
@@ -417,9 +583,9 @@
 
   /* ---- Render ---- */
   function render(){
-    const m = METHODS[state.method];
-    const ratio = m.ratio + OFFSETS[state.strength];
-    let waterMl, coffeeG;
+    var m = METHODS[state.method];
+    var ratio = m.ratio + OFFSETS[state.strength];
+    var waterMl, coffeeG;
 
     if(state.mode === "cups"){
       waterMl = state.cups * m.cupMl;
@@ -429,10 +595,10 @@
       waterMl = coffeeG * ratio;
     }
 
-    const waterR = Math.round(waterMl);
-    const oz = (waterMl / ML_PER_OZ).toFixed(1);
-    const coffeeR = coffeeG >= 100 ? Math.round(coffeeG) : (Math.round(coffeeG * 10) / 10).toFixed(1);
-    const tbsp = (coffeeG / TBSP_G).toFixed(1);
+    var waterR = Math.round(waterMl);
+    var oz = (waterMl / ML_PER_OZ).toFixed(1);
+    var coffeeR = coffeeG >= 100 ? Math.round(coffeeG) : (Math.round(coffeeG * 10) / 10).toFixed(1);
+    var tbsp = (coffeeG / TBSP_G).toFixed(1);
 
     setBumped("waterMl", waterR.toLocaleString("en-US") + "<small>ml</small>");
     setBumped("waterOz", "≈ " + oz + " fl oz");
@@ -445,7 +611,7 @@
       ? trimNum(state.cups) + " cup" + (state.cups === 1 ? "" : "s") + " × " + m.cupMl + " ml, at " + STRENGTH_DESC[state.strength].split(" — ")[0].toLowerCase() + " strength"
       : trimNum(state.grams) + " g of coffee, at " + STRENGTH_DESC[state.strength].split(" — ")[0].toLowerCase() + " strength";
 
-    const coffeePct = (100 / (1 + ratio)).toFixed(2);
+    var coffeePct = (100 / (1 + ratio)).toFixed(2);
     $("barCoffee").style.width = coffeePct + "%";
     $("barWater").style.width = (100 - coffeePct) + "%";
     $("barParts").textContent = ratio + " parts";
@@ -456,7 +622,7 @@
   }
 
   function setBumped(id, html){
-    const el = $(id);
+    var el = $(id);
     if(el.innerHTML !== html){ el.innerHTML = html; bump(el); }
   }
 
